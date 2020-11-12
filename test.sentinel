@@ -1,0 +1,34 @@
+import "time"
+import "tfrun"
+import "timezone"
+
+
+param token default "WbNKULOBheqV"
+param maintenance_days default ["Friday", "Saturday", "Sunday"]
+param timezone_id default "America/Los_Angeles"
+
+tfrun_created_at = time.load(tfrun.created_at)
+
+supported_maintenance_day = rule when tfrun.workspace.auto_apply is true {
+    tfrun_created_at.add(time.hour * timezone.offset(timezone_id, token)).weekday_name in maintenance_days
+}
+
+
+main = rule {
+    supported_maintenance_day
+}
+
+/*
+is_weekday = rule { 
+    day not in ["saturday", "sunday"] 
+}
+
+is_open_hours = rule { 
+    hour > 8 and hour < 17 
+}
+
+
+main = rule { 
+    is_open_hours and is_weekday
+}
+*/
